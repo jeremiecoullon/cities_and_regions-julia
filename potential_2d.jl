@@ -1,13 +1,13 @@
 #!/usr/bin/env julia
 
 using Plots
-using CSV
+using DelimitedFiles
 
 include("./src/Potential.jl")
 
 
-cost_mat = convert(Matrix, CSV.read("data/london_n/cost_mat.txt", header=false))
-orig = convert(Matrix, CSV.read("data/london_n/P.txt", header=false))
+cost_mat = readdlm("data/london_n/cost_mat.txt")
+orig = readdlm("data/london_n/P.txt")
 
 # Keep only 2 destination zones and normalise the matrix
 cost_mat = cost_mat[:, 1:2] / sum(cost_mat[:, 1:2])

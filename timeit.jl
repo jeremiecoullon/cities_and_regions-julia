@@ -1,13 +1,13 @@
 #!/usr/bin/env julia
 
-using CSV
+using DelimitedFiles
 using BenchmarkTools
 include("./src/Potential.jl")
 
 "Time the potential and hessian functions"
 
-cost_mat = convert(Matrix, CSV.read("data/london_n/cost_mat.txt", header=false))
-orig = convert(Matrix, CSV.read("data/london_n/P.txt", header=false))
+cost_mat = readdlm("data/london_n/cost_mat.txt")
+orig = readdlm("data/london_n/P.txt")
 
 N, M = size(cost_mat)
 

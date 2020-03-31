@@ -2,14 +2,13 @@
 
 using Test
 using DelimitedFiles
-using CSV
 
 include("./src/Potential.jl")
 
 "Run some basic tests"
 
-cost_mat = convert(Matrix, CSV.read("data/london_n/cost_mat.txt", header=false))
-orig = convert(Matrix, CSV.read("data/london_n/P.txt", header=false))
+cost_mat = readdlm("data/london_n/cost_mat.txt")
+orig = readdlm("data/london_n/P.txt")
 
 N, M = size(cost_mat)
 

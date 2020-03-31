@@ -1,6 +1,5 @@
 #!/usr/bin/env julia
 using Distributions
-using CSV
 using DelimitedFiles
 
 include("./src/Potential.jl")
@@ -9,8 +8,8 @@ include("./src/Parallel_tempering.jl")
 
 
 println("Loading data..")
-cost_mat = convert(Matrix, CSV.read("data/london_n/cost_mat.txt", header=false))
-orig = convert(Matrix, CSV.read("data/london_n/P.txt", header=false))
+cost_mat = readdlm("data/london_n/cost_mat.txt")
+orig = readdlm("data/london_n/P.txt")
 # origin, destination
 nn, mm = size(cost_mat)
 
@@ -73,7 +72,7 @@ function runHMC(mcmc_n)
             println("Saving iteration $(i+1)")
             println("X AR: $(ac/pc)")
             println("Swap AR: $(acs/pcs)")
-            writedlm("outputs/hmc_samples$(alpha).txt", samples, ",")
+            writedlm("outputs/hmc_samples$(alpha).txt", samples)
         end
     end
 
