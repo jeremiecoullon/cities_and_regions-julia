@@ -7,6 +7,7 @@ include("./src/Potential.jl")
 
 
 cost_mat = readdlm("data/london_n/cost_mat.txt")
+cost_adj = convert(Array, cost_mat')
 orig = readdlm("data/london_n/P.txt")
 xd = readdlm("data/london_n/xd0.txt")
 
@@ -23,23 +24,28 @@ theta = [alpha, beta, delta, gamma, kappa]
 
 # potential for given parameter values
 function valuePot(X)
-    val, grad = Potential.potential(X, orig, cost_mat, theta, nn, mm)
-    val
+    Potential.potential_val(X, orig, cost_adj, theta, nn, mm)
 end
 
-function gradPot(X)
-    val, grad = Potential.potential(X, orig, cost_mat, theta, nn, mm)
-    grad
+function gradPot!(grad, X)
+    Potential.potential_grad!(grad,X, orig, cost_adj, theta, nn, mm)
 end
 
 
-function optimise_model(m)
-    "Input: minimizer for the potential function"
+function optimise_model(m, delta, valuePot, gradPot!)
+    """
+    Parameters:
+    ----------
+    m: default minimizer for the potential function if no result is found
+    delta: to determine the IC
+    valuePot: potential function
+    gradPot: gradient of potential function
+    """
     f_val = Inf16
     for k in 1:mm
         g = log(delta)*ones(mm)
         g[k] = log(1+delta)
-        f = optimize(valuePot, gradPot, g, LBFGS(), inplace=false)
+        f = optimize(valuePot, gradPot!, g, LBFGS())
         if f.minimum < f_val
             f_val = f.minimum
             m = f.minimizer
@@ -47,6 +53,6 @@ function optimise_model(m)
     end
     m
 end
-m = optimise_model(xd)
+m = optimise_model(xd, delta, valuePot, gradPot!)
 
 writedlm("outputs/opt$alpha.txt", m)

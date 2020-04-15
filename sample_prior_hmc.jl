@@ -2,6 +2,10 @@
 using Distributions
 using DelimitedFiles
 
+"""
+To use threads, run `JULIA_NUM_THREADS=4 julia sample_prior_hmc.jl`
+"""
+
 include("./src/Potential.jl")
 include("./src/hmc.jl")
 include("./src/Parallel_tempering.jl")
@@ -9,6 +13,7 @@ include("./src/Parallel_tempering.jl")
 
 println("Loading data..")
 cost_mat = readdlm("data/london_n/cost_mat.txt")
+cost_adj = convert(Array, cost_mat')
 orig = readdlm("data/london_n/P.txt")
 # origin, destination
 nn, mm = size(cost_mat)
@@ -23,7 +28,8 @@ kappa = 1.3
 theta = [alpha, beta, delta, gamma, kappa]
 
 function U_fun(x::Array{Float64,1})
-    Potential.potential(x, orig, cost_mat, theta, nn, mm)
+    grad = Array{Float64,1}(undef, mm)
+    Potential.potential!(grad, x, orig, cost_adj, theta, nn, mm)
 end
 
 L = 10
@@ -51,7 +57,7 @@ function runHMC(mcmc_n)
     pcs = 1
     # MCMC algorithm
     for i in 1:mcmc_n
-        for j in 1:temp_n
+        Threads.@threads for j in 1:temp_n
             xNew, V_New, gradV_New, ac_New = HMC_Prior.hmc_step(xx[j,:], U_fun, V[j],
                                         gradV[j,:], inverse_temps[j], eps, L, mm)
             xx[j,:] = xNew
@@ -72,7 +78,7 @@ function runHMC(mcmc_n)
             println("Saving iteration $(i+1)")
             println("X AR: $(ac/pc)")
             println("Swap AR: $(acs/pcs)")
-            writedlm("outputs/hmc_samples$(alpha).txt", samples)
+            # writedlm("outputs/hmc_samples$(alpha).txt", samples)
         end
     end
 
