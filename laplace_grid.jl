@@ -20,7 +20,7 @@ using Plots
 @everywhere alpha = 1
 @everywhere beta = 0
 @everywhere delta = 0.3/mm
-@everywhere gamma = 100
+@everywhere gamma = 10000
 @everywhere kappa = 1.3
 
 @everywhere theta = [alpha, beta, delta, gamma, kappa]
@@ -56,7 +56,6 @@ using Plots
 end
 
 @everywhere function estimatePosterior(alpha, beta)
-    # println("post for (alpha, beta) = ($alpha, $beta)")
     lap_c1 = 0.5*mm*log(2*pi)
     theta = [alpha, beta, delta, gamma, kappa]
     levaluePot = X -> Potential.potential_val(X, orig, cost_adj, theta, nn, mm)[1]
@@ -71,34 +70,21 @@ end
     lik_value = - lap - pot_data
 end
 
-# lala = estimatePosterior(0.5, (1.4e6)/2)
-# println("$lala")
 
-@everywhere grid_n = 5
+@everywhere grid_n = 20
 x = [el for el in LinRange(0.1,2, grid_n)]
 @everywhere y = [el for el in LinRange(0.1,1.4e6, grid_n)]
 
 
-# With threads: Run `JULIA_NUM_THREADS=4 julia laplace_grid.jl`
-# println("Running grid search:\n")
-# Threads.@threads for xval in x
-#     lala = estimatePosterior(xval, (1.4e6)/2)
-#     println("Thread $(Threads.threadid()): ($xval, $((1.4e6)/2)) has likelihood $lala\n")
-# end
-
 # Distributed
-println("Running grid search:\n")
+println("Running grid search ($grid_n * $grid_n):\n")
 laplaceArray = Array{Float64, 2}(undef, grid_n, grid_n)
 for j in 1:grid_n
-    println("computing log-lik for all x values and with y=$(round(y[j]/1.4e6, digits=3)) (y in (0,1))\n")
-    laplaceArray[:,j] = pmap(xval -> estimatePosterior(xval, x[j]), x)
+    println("computing log-lik for all y values and with x=$(round(x[j], digits=3)) (x in (0, 2))\n")
+    laplaceArray[:,j] = pmap(yval -> estimatePosterior(x[j], yval), y)
 end
 writedlm("outputs/laplace_analysis$(gamma).txt", laplaceArray)
 
 
-# laplaceArray = readdlm("outputs/laplace_analysis100.txt")
-# x = [el for el in LinRange(0.1,2, grid_n)]
-# modifiedy = [el for el in LinRange(0.1,1.4e6, grid_n)] * 2/1.4e6
-# contourf(x,y, modifiedy)
+contourf(x, y* 2/1.4e6, laplaceArray, xlabel="alpha", ylabel="beta", title="Logarithm of (4.1) with gamma=$gamma")
 savefig("images/laplace_grid$(gamma).png")
-# plot(laplaceArray)
