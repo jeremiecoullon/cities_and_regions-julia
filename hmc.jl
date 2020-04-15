@@ -3,7 +3,7 @@ using Distributions
 using DelimitedFiles
 
 """
-To use threads, run `JULIA_NUM_THREADS=4 julia sample_prior_hmc.jl`
+To use threads, run `JULIA_NUM_THREADS=4 julia hmc.jl`
 """
 
 include("./src/Potential.jl")
@@ -78,7 +78,7 @@ function runHMC(mcmc_n)
             println("Saving iteration $(i+1)")
             println("X AR: $(ac/pc)")
             println("Swap AR: $(acs/pcs)")
-            # writedlm("outputs/hmc_samples$(alpha).txt", samples)
+            writedlm("outputs/hmc_samples$(alpha).txt", samples)
         end
     end
 
