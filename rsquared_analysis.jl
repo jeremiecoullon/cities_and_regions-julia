@@ -39,8 +39,8 @@ function run_rsquared(rsquaredArray)
         println("computing rsquared for all y values and with x=$(round(x[j], digits=3)) (x in (0,2))\n")
             Threads.@threads for i in 1:grid_n
             theta = [x[j], y[i], delta, gamma, kappa]
-            levaluePot = X -> Potential.potential_val(X, orig, cost_adj, theta, nn, mm)[1]
-            legradPot! = (grad, X) -> Potential.potential_grad!(grad, X, orig, cost_adj, theta, nn, mm)[2]
+            levaluePot = X -> Potential.potential_val(X, orig, cost_adj, theta, nn, mm)
+            legradPot! = (grad, X) -> Potential.potential_grad!(grad, X, orig, cost_adj, theta, nn, mm)
             try
                 f = optimize(levaluePot, legradPot!, xd[:,1], LBFGS())
                 w_pred = map(exp, f.minimizer)

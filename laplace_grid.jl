@@ -58,15 +58,15 @@ end
 @everywhere function estimatePosterior(alpha, beta)
     lap_c1 = 0.5*mm*log(2*pi)
     theta = [alpha, beta, delta, gamma, kappa]
-    levaluePot = X -> Potential.potential_val(X, orig, cost_adj, theta, nn, mm)[1]
-    legradPot! = (grad, X) -> Potential.potential_grad!(grad, X, orig, cost_adj, theta, nn, mm)[2]
+    levaluePot = X -> Potential.potential_val(X, orig, cost_adj, theta, nn, mm)
+    legradPot! = (grad, X) -> Potential.potential_grad!(grad, X, orig, cost_adj, theta, nn, mm)
 
     minimizer, le_min = optimise_model(xd, delta, levaluePot, legradPot!)
     A = Potential.hessian(minimizer, orig, cost_mat, theta, nn, mm)
     L = cholesky(A).L
     half_log_det_A = sum(map(log, diag(L)))
     lap = - le_min + lap_c1 - half_log_det_A
-    pot_data = Potential.potential_val(xd[:,1], orig, cost_adj, [alpha, beta, delta, gamma, kappa], nn, mm)[1]
+    pot_data = Potential.potential_val(xd[:,1], orig, cost_adj, [alpha, beta, delta, gamma, kappa], nn, mm)
     lik_value = - lap - pot_data
 end
 

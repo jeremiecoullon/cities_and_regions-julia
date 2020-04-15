@@ -56,7 +56,7 @@ module Potential
         α, β, δ, γ, κ = theta
         value_sum_N = 0
         for j in 1:M
-            grad[j]=  (κ * exp(X[j]) - δ)
+            grad[j]=  γ*(κ * exp(X[j]) - δ)
         end
 
         for i in 1:N
@@ -64,11 +64,11 @@ module Potential
             sum_M = _inner_sum_M!(sum_M, X, cost_adj, α, β, M, i)
             value_sum_N += orig[i]*log(sum_M)
             for j in 1:M
-                grad[j] +=  -(1/α)* orig[i]*α*exp(α*X[j] - β*cost_adj[j,i]) / sum_M
+                grad[j] +=  -(γ/α)* orig[i]*α*exp(α*X[j] - β*cost_adj[j,i]) / sum_M
             end
         end
         value =  -(1/α)*value_sum_N + κ * sum(map(exp, X)) - δ * sum(X)
-        [γ*value, γ*grad]
+        [γ*value, grad]
     end
 
 
@@ -90,17 +90,17 @@ module Potential
             """
         α, β, δ, γ, κ = theta
         for j in 1:M
-            grad[j]=  (κ * exp(X[j]) - δ)
+            grad[j]=  γ*(κ * exp(X[j]) - δ)
         end
 
         for i in 1:N
             sum_M = 0.
             sum_M = _inner_sum_M!(sum_M, X, cost_adj, α, β, M, i)
             for j in 1:M
-                grad[j] +=  -(1/α)* orig[i]*α*exp(α*X[j] - β*cost_adj[j,i]) / sum_M
+                grad[j] +=  -(γ/α)* orig[i]*α*exp(α*X[j] - β*cost_adj[j,i]) / sum_M
             end
         end
-        γ*grad
+        grad
     end
 
 
