@@ -25,8 +25,8 @@ nn, mm = size(cost_mat)
 
 
 # low noise: gamma = 10000.
-alpha = 2.0
-beta = 0.3*0.7e6
+alpha = 1
+beta = 0
 delta = 0.3/mm
 gamma = 10000.
 kappa = 1.3
