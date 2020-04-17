@@ -1,37 +1,5 @@
 module Potential
 
-    function potential(X::Array{Float64,1}, orig::Array{Float64,2},
-            cost_mat::Array{Float64,2}, theta::Array{Float64,1}, N::Int64, M::Int64)
-            """
-            Returns the value of the potential as well as the gradient
-            """
-        α, β, δ, γ, κ = theta
-        value_sum_N = 0
-        grad_sum_N = zeros(M)
-        cost_adj = cost_mat'
-
-        for i in 1:N
-            sum_M = 0
-            for j in 1:M
-                sum_M += exp(α*X[j] - β*cost_adj[j,i])
-            end
-            value_sum_N += orig[i]*log(sum_M)
-            grad_top_term = orig[i]*(α*map(exp, α*X - β*cost_mat[i, :]))
-            grad_sum_N += grad_top_term / sum_M
-        end
-        value_part1 = -(1/α)*value_sum_N
-        value_part2 = κ * sum(map(x -> exp(x), X))
-        value_part3 = - δ * sum(X)
-
-        grad_part1 = -(1/α)*grad_sum_N
-        grad_part2 = κ * map(x -> exp(x), X)
-        grad_part3 = - δ * ones(M)
-
-        value = γ * (value_part1 + value_part2 + value_part3)
-        grad = γ * (grad_part1 + grad_part2 + grad_part3)
-        [value, grad]
-    end
-
     function _inner_sum_M!(sum_M::Float64, X::Array{Float64,1}, cost_adj::Array{Float64,2},α::Float64, β::Float64, M::Int64, i::Int64)
         for j in 1:M
             sum_M += exp(α*X[j] - β*cost_adj[j,i])
@@ -51,7 +19,7 @@ module Potential
     function potential!(grad::Array{Float64,1}, X::Array{Float64,1}, orig::Array{Float64,2}, cost_adj::Array{Float64,2}, theta::Array{Float64,1}, N::Int64, M::Int64)
         """
         Returns the value of the potential as well as the gradient.
-        Improvement on old potential: is optimized, and modifies grad
+        Modifies grad
         """
         α, β, δ, γ, κ = theta
         value_sum_N = 0
@@ -102,7 +70,6 @@ module Potential
         end
         grad
     end
-
 
 
     function hessian(X::Array{Float64,1}, orig::Array{Float64,2},

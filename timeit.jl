@@ -27,10 +27,6 @@ println("Timing the Hessian function")
 println("Done")
 
 println("\nNow timing the Potential function")
-@btime Potential.potential(xval, orig, cost_mat, theta, N, M)
-println("Done")
-
-println("\nNow timing the Potential function (faster version)")
 grad = Array{Float64,1}(undef, M)
 @btime Potential.potential!(grad, xval, orig, cost_adj, theta, N, M)
 println("Done")
