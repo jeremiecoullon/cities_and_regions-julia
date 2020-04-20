@@ -4,6 +4,10 @@ using DelimitedFiles
 using LinearAlgebra
 using Plots
 
+"""
+To use threads, run `JULIA_NUM_THREADS=4 julia rsquared_analysis.jl`
+"""
+
 include("./src/Potential.jl")
 
 println("Loading data..")

@@ -5,7 +5,7 @@ using DelimitedFiles
 
 include("./src/Potential.jl")
 
-
+println("Loading data..")
 cost_mat = readdlm("data/london_n/cost_mat.txt")
 cost_adj = convert(Array, cost_mat')
 orig = readdlm("data/london_n/P.txt")
@@ -34,6 +34,7 @@ end
 x = -4:(9/100):(.5 - 9/100)
 y = -4:(9/100):(.5 - 9/100)
 
+println("Creating figure..")
 learr = []
 for alpha in [0.5, 1., 1.5, 2.]
     zfun = (x,y) -> exp(-valuePot([x,y], alpha))
